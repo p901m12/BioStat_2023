@@ -8,20 +8,22 @@ toc title: "Оглавление"
 ---
 #Главный чанк
 ```{r настройка, include=FALSE}
-knitr::opts_chunk$set(eval = TRUE, message=FALSE)
+knitr::opts_chunk$set(eval = TRUE, error = FALSE, message=FALSE, warning = FALSE)
 ```
 #Установка и подключение пакетов
 *readr* предназначен для чтения наиболее распространенных форматов данных;
 *dplyr* помогает совершать базовые манипуляции с данными - изменять переменные, фильтровать по условию, вычислять сводные статистики;
 *psych* для рассчета статистик;
-*tibble* облегчает работу с таблицами.
+*tibble* облегчает работу с таблицами;
+*tidyr* помогает сделать данные чистыми
 
 ```{r полезные пакеты}
-install.packages(c("dplyr", "readr", "tibble", "psych"))
+install.packages(c("dplyr", "readr", "tibble", "psych", "tidyr"))
 library(readr)
 library(dplyr)
 library(psych)
 library(tibble)
+library(tidyr)
 ```
 #Чтение данных
 ```{r import}
@@ -50,3 +52,23 @@ data %>%
   mutate(ID=row_number()) %>%
   slice_sample(prop=0.1)
 ```
+#Формирование статистической таблицы
+для примера, написана таблица для количественной переменной по шаблону из раздела курса по R "6.12 Расчет статистик"
+```{r stat_tab}
+statistics <- list(
+      `Количество субъектов` = ~length(.x) %>% as.character(),
+      `Количество (есть данные)` = ~sum(!is.na(.x)) %>% as.character(),
+      `Нет данных` = ~sum(is.na(.x)) %>% as.character(),
+      `Ср. знач.` = ~ifelse(sum(!is.na(.x)) == 0, "Н/П*", mean(.x, na.rm = TRUE) %>% round(2) %>% as.character()),
+      `Станд. отклон.` = ~ifelse(sum(!is.na(.x)) < 3, "Н/П*", sd(.x, na.rm = TRUE) %>% round(2) %>% as.character()),
+      `95% ДИ для среднего` = ~sd(.x, na.rm = TRUE) %>% round(2) %>% as.character(),
+      `мин. - макс.` = ~ifelse(sum(!is.na(.x)) == 0, "Н/П*", paste0(min(.x, na.rm = TRUE) %>% round(2), " - ", max(.x, na.rm = TRUE) %>% round(2))),
+      `Медиана` = ~ifelse(sum(!is.na(.x)) == 0, "Н/П*", median(.x, na.rm = TRUE) %>% round(2) %>% as.character()),
+      `Q1 - Q3` = ~ifelse(sum(!is.na(.x)) == 0, "Н/П*", paste0(quantile(.x, 0.25, na.rm = TRUE) %>% round(2), " - ", quantile(.x, 0.75, na.rm = TRUE) %>% round(2)))
+)
+
+data %>% select(`Группа`, where(is.numeric)) %>% group_by(`Группа`) %>%
+    summarize(across(where(is.numeric), statistics)) %>% pivot_longer(!`Группа`) %>% separate(name, into = c("Переменная", "Статистика"), sep = "_") %>% rename(`Значение` = `value`)
+```
+p.s.
+**Merci pour votre attention!**
