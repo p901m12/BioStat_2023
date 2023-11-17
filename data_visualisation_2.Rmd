@@ -1,0 +1,275 @@
+---
+title: "Data visualisation part 2"
+author: "Polina Burmakina"
+date: "2023-11-15"
+output:output: 
+  html_document:
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(plotly)
+library(rstatix)
+library(corrplot)
+library(corrr)
+library(ggfortify)
+library(readr)
+library(factoextra)
+library(pheatmap)
+library(FactoMineR)
+devtools::install_github("vqv/ggbiplot")
+library(ggbiplot)
+library(readr)
+library(ggrepel)
+library(viridis)
+library(ggpubr)
+```
+
+## Задание №1
+```{r}
+led <- read_rds("~/data/raw/life_expectancy_data.RDS")
+```
+## Задание №2
+```{r}
+plot_ly(data = led[(led$'Clean fuels and cooking technologies' != 0) & (led$'Per Capita' != 0),],
+        x = ~ `Clean fuels and cooking technologies`,
+        y = ~ `Per Capita`,
+        color = ~ continent,
+        type = 'scatter',
+        mode = 'markers')
+```
+
+## Задание №3
+Проведем *t-test* c использованием **rstatix** :
+```{r, dpi=300}
+# выберем числовые переменные
+filtered_led <- led %>% 
+  filter(continent %in% c("Africa", "Americas"))
+
+# выведем qqplot
+ggqqplot(filtered_led, 
+         x = 'Life expectancy')
+
+# проведем t-test
+stat.test <- filtered_led %>% 
+  t_test(`Life expectancy` ~ continent) %>%  # Use backticks around the column name
+  add_xy_position(x = 'continent')
+stat.test
+
+# визуализируем
+my_pal <- c("lightyellow", "lightcoral")
+ 
+ggboxplot(filtered_led, 
+          x = 'continent', y = 'Life expectancy',  # Remove extra single quotes
+          ylab = "Life expectancy", xlab = "Continent", fill = 'continent', palette = my_pal,
+          add = "jitter") + 
+  labs(subtitle = get_test_label(stat.test, detailed = TRUE)) + 
+  stat_pvalue_manual(stat.test, tip.length = 0) +
+  theme_minimal()
+
+```
+
+## Задание №4
+Корреляционный анализ датасета
+```{r, dpi=300}
+# возьмем только numeric
+led_nums <- led %>% select_if(is.numeric) %>% select(- Year)
+scaled_led <- scale(led_nums)
+led_cor <- cor(scaled_led) 
+
+# 1й график с помощью пакета *corrplot*
+color_palette <- colorRampPalette(rev(RColorBrewer::brewer.pal(10, "RdYlBu")))(100)
+corrplot(led_cor, method = "color", type = "lower", order = "hclust", tl.col = "black", tl.srt = 45, tl.cex = 0.7, col = color_palette)
+
+# 2й график с помощью пакета *corrr*
+led_cor %>% 
+  rplot() + theme( axis.text.x = element_text(angle = 45, vjust = 1, hjust =1))
+```
+
+## Задание №5
+Сделаем дендрограммный график методом иерархической кластеризации
+```{r, warning = F, dpi=300}
+column_labels <- colnames(scaled_led)
+
+led_dist <- dist(scaled_led, method = "euclidean")
+led_hc <- hclust(d = led_dist, method = "ward.D2")
+
+fviz_dend(
+  led_hc,
+  cex = 0.1,
+  horiz = F)
+```
+## Задание №6
+* Объединяя дендрограмму и тепловую карту, можно сделать о данных какие-то предположения. Наибольшая ~~теплота~~ видна в кластере с валовым внутренним и национальным продуктами, которые стоят в данных особняком, возможно, на них далее особого внимания обращать не стоит. 
+* Более содержательными/логичными выглядят другие кластеры (которые еще лучше видны на треугольной тепловой карте выше) - кластер с несколькими видами вакцинации и кластер, объединяющий продолжительность жизни + городское население + доступность медицинской помощи, технологий, продуктов питания.
+* Остается кластер со "всем остальным" - лечением туберкулеза, смертностью и безработицей, в котором тоже присутствует логика
+* Ощущается недостаток метода - необходимость самостоятельно подбирать количество кластеров,что не очень просто сделать основываясь на ~~предположениях~~  (у меня количество кластеров наугад)
+* График будто бы пересыщен информацией, которую не очень просто и удобно читать, без уменьшения размерности никак не обойтись
+```{r, dpi=300}
+pheatmap(scaled_led, 
+         show_rownames = T, 
+         clustering_distance_rows = led_dist,
+         clustering_method = "ward.D2", 
+         cutree_rows = 4,
+         cutree_cols = length(colnames(scaled_led)),
+         angle_col = 45, 
+         main = "Dendrograms for clustering rows and columns with heatmap")
+
+```
+## Задание №7-9
+Проведем анализ главных компонент
+```{r}
+led.pca <- prcomp(scaled_led)
+summary(led.pca)
+```
+У нас много переменных - целых 19, без учета переменных другого типа, а более 75% картины, судя по *Cumulative Proportion*, можно получить, используя первые 5. Наиболее информативные - даже первые 3, вклад остальных - менее 10%.
+```{r, dpi=300}
+fviz_eig(led.pca, addlabels = T, ylim = c(0, 40))
+```
+
+Выведем эти 5 компонент. Картина получается вроде:
+* продолжительность жизни увеличивается с какой-то "долей" пропорции вакцинацией [жизнь]
+* [смерть] изменяется обратнопропорционально - что как бы тянет вниз продолжительность жизни и логично вытекает из "отсутствия" вакцинации
+```{r, dpi=300}
+fviz_pca_var(led.pca, col.var = "contrib", select.var = list(contrib = 5))
+```
+P.S.  мои попытки вывести на biplot снова только 5 компонент успехом не увенчались( буду рада комментарию/совету по тому, как можно это сделать
+```{r, warning=F, dpi=300}
+
+plot <- ggbiplot(led.pca, 
+                 #select.var = list(contrib = 5),col.var = "contrib",
+                 #choices = 1:5, 
+                 scale = 0,
+                 groups = as.factor(led$continent),
+                 color = as.factor(led$continent),
+                 ellipse = TRUE, 
+                 alpha = 0.2,
+                 palette = viridis::viridis_pal()) +  # Используем цветовую палитру Viridis
+  theme_minimal()
+plot
+
+
+biplot_plotly <- ggplotly(plot)
+
+biplot_plotly <- biplot_plotly %>%
+  add_trace(
+    type = "scatter",
+    mode = "markers",
+    x = led.pca$x[, 1],
+    y = led.pca$x[, 2],
+    hoverinfo = "text",
+    text = led$Country,
+    marker = list(color = as.factor(led$continent)),
+    showlegend = F,  # Скрываем легенду для данного следа
+    source = "source"   # Указываем источник данных
+  )
+
+biplot_plotly
+```
+Такой график дает много информации, на нем видны какие-то общеизвестные тенденции и его инересно рассматривать. Попробую привести примеры, но их список конечно же далеко не полный (в виду моей ненасмотренности в каких-то "геополитических" и других темах)
+* Длинная стрелка вверх в "эконочимеских" показателях - ввп на душу населения - стремится в Америку (забавно и примечательно, что стретка суицида - тоже);
+* "Проблемные" стрелки вроде смертности, туберкулеза и безработицы перетягивается наблюдениямми из Африки;
+* Стлелочки, ассициированные с "ростом" технологий, продолжительности жизни, уровнем медицинской помощь - в Европейской части;
+* Азиатские страны где-то между Европой и Америкой;
+
+## Задание №11
+Повторим анализ главных компонент на уменьшенном датасете несколько раз.
+* На наших данных  pca не очень хорош, потому что 2-3 компонент не достаточно. На 14 столбцах в 2 из 3 ~~экспериментах~~ можно остановиться на 4 главных компонентах, то есть, уменьшив примерно на четверть данные мы пришли к количеству компонент на 1/5 меньше чем вначале. 
+* У меня в главные компоненты все разы вышла смертность, продолжительность жизни/что-то другое из (благоприятного) кластера, в качестве оставшихся составляющих попал кластер с ввп/внп, а на другой - кластер с вакцинацией. МОжно сделать вывод о том, что количество кластеров, окторое я до этого пыталась выделить, не так уж и плохо - все они представлены в "информативных" компонентах.
+* Первый и второй biplots очень похожи, но как-то перевернуты сверху вниз, а вот третий - отличается (в него не вошла как минимум продолжительность жизни из важного). Можно заключить, что метод не очень стабильный/устойчивый.
+```{r, dpi=300}
+# Установка зерна случайности для воспроизводимости 
+set.seed(123)
+
+# сделаем 3 уменьшенных на 5 столбцов датасета
+rand_led_1 <- rand_led_2 <- rand_led_3 <- NULL
+
+for (i in 1:3) {
+  cols_to_keep <- sample(colnames(led_nums), 14)
+  rand_led <- led_nums[, ..cols_to_keep]
+
+  if (i == 1) {
+    rand_led_1 <- rand_led
+  } else if (i == 2) {
+    rand_led_2 <- rand_led
+  } else {
+    rand_led_3 <- rand_led
+  }
+}
+
+
+# PCA
+pca_results <- list()
+
+for (i in 1:3) {
+  rand_led <- switch(i,
+                     rand_led_1,
+                     rand_led_2,
+                     rand_led_3)
+  
+ 
+  scaled_rand_led <- scale(rand_led)
+
+  pca_result <- prcomp(scaled_rand_led)
+
+  pca_results[[paste0("rand_", i, "_pca")]] <- pca_result
+
+  print(paste("Summary for rand_", i, "_pca:"))
+  print(summary(pca_result))
+}
+
+
+
+# Связь переменных
+plot_list <- list()
+
+for (i in 1:3) {
+  pca_result <- pca_results[[paste0("rand_", i, "_pca")]]
+  
+  plot <- fviz_pca_var(pca_result, col.var = "contrib", select.var = list(contrib = 4))
+  
+  plot_list[[paste0("plot_", i)]] <- plot
+}
+
+
+combined_plot <- ggarrange(plotlist = plot_list, ncol = 3, common.legend = TRUE, legend = "right") +
+  labs(title = "Random Variance Contributions")
+print(combined_plot)
+
+
+
+# biplot
+plot_list2 <- list()
+
+for (i in 1:3) {
+  pca_result <- pca_results[[paste0("rand_", i, "_pca")]]
+  
+  plot2 <- ggbiplot(pca_result, 
+                   scale = 0,
+                   groups = as.factor(led$continent),
+                   color = as.factor(led$continent),
+                   ellipse = TRUE, 
+                   alpha = 0.2,
+                   palette = viridis::viridis_pal()) +
+    theme_minimal() +
+    ggtitle(paste("Biplot for rand_", i, "_pca"))
+  
+  plot_list2[[paste0("plot_", i)]] <- plot2
+}
+
+combined_plot2 <- ggarrange(plotlist = plot_list2, ncol = 3, common.legend = TRUE, legend = "bottom",
+                            widths = rep(1, 3), heights = rep(1, 3)) + 
+  theme(legend.position = "bottom") + 
+  labs(title = "Random Biplots")
+
+print(combined_plot2)
+
+```
+P.S. решение объединить 3 графика в один для biplots скорее плохое, я пыталась их отмасштабировать и сделать общий заголовок, но не слишком успешно( ~~мне просто хотелось потренироваться соединять графики в один output)~~.
