@@ -2,9 +2,7 @@
 title: "Data visualisation part 2"
 author: "Polina Burmakina"
 date: "2023-11-15"
-output:output: 
-  html_document:
-    keep_md: true
+output:  rmarkdown::github_document
 ---
 
 ```{r setup, include=FALSE}
