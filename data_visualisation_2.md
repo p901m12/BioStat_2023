@@ -22,7 +22,7 @@ plot_ly(data = led[(led$'Clean fuels and cooking technologies' != 0) & (led$'Per
 
     ## PhantomJS not found. You can install it with webshot::install_phantomjs(). If it is installed, please make sure the phantomjs executable can be found via the PATH variable.
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-3-1.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-3-1.png)<!-- -->
 
 ## Задание №3
 
@@ -38,7 +38,7 @@ ggqqplot(filtered_led,
          x = 'Life expectancy')
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-4-1.png)<!-- -->
 
 ``` r
 # проведем t-test
@@ -67,7 +67,7 @@ ggboxplot(filtered_led,
   theme_minimal()
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-4-2.png)<!-- -->
 
 ## Задание №4
 
@@ -84,7 +84,7 @@ color_palette <- colorRampPalette(rev(RColorBrewer::brewer.pal(10, "RdYlBu")))(1
 corrplot(led_cor, method = "color", type = "lower", order = "hclust", tl.col = "black", tl.srt = 45, tl.cex = 0.7, col = color_palette)
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 # 2й график с помощью пакета *corrr*
@@ -92,7 +92,7 @@ led_cor %>%
   rplot() + theme( axis.text.x = element_text(angle = 45, vjust = 1, hjust =1))
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-5-2.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-5-2.png)<!-- -->
 
 ## Задание №5
 
@@ -110,7 +110,7 @@ fviz_dend(
   horiz = F)
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-6-1.png)<!-- -->
 \## Задание №6 \* Объединяя дендрограмму и тепловую карту, можно сделать
 о данных какие-то предположения. Наибольшая ~~теплота~~ видна в кластере
 с валовым внутренним и национальным продуктами, которые стоят в данных
@@ -138,7 +138,7 @@ pheatmap(scaled_led,
          main = "Dendrograms for clustering rows and columns with heatmap")
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-7-1.png)<!-- -->
 \## Задание №7-9 Проведем анализ главных компонент
 
 ``` r
@@ -169,7 +169,7 @@ summary(led.pca)
 fviz_eig(led.pca, addlabels = T, ylim = c(0, 40))
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-9-1.png)<!-- -->
 
 Выведем эти 5 компонент. Картина получается вроде: \* продолжительность
 жизни увеличивается с какой-то “долей” пропорции вакцинацией \[жизнь\]
@@ -180,7 +180,7 @@ fviz_eig(led.pca, addlabels = T, ylim = c(0, 40))
 fviz_pca_var(led.pca, col.var = "contrib", select.var = list(contrib = 5))
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-10-1.png)<!-- -->
 P.S. мои попытки вывести на biplot снова только 5 компонент успехом не
 увенчались( буду рада комментарию/совету по тому, как можно это сделать
 
@@ -198,7 +198,7 @@ plot <- ggbiplot(led.pca,
 plot
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 biplot_plotly <- ggplotly(plot)
@@ -219,7 +219,7 @@ biplot_plotly <- biplot_plotly %>%
 biplot_plotly
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-11-2.png)<!-- -->
 Такой график дает много информации, на нем видны какие-то общеизвестные
 тенденции и его инересно рассматривать. Попробую привести примеры, но их
 список конечно же далеко не полный (в виду моей ненасмотренности в
@@ -340,7 +340,7 @@ combined_plot <- ggarrange(plotlist = plot_list, ncol = 3, common.legend = TRUE,
 print(combined_plot)
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 # biplot
@@ -370,7 +370,7 @@ combined_plot2 <- ggarrange(plotlist = plot_list2, ncol = 3, common.legend = TRU
 print(combined_plot2)
 ```
 
-![](data_visualisation_2_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
+![](datavis_pic/HW2/unnamed-chunk-12-2.png)<!-- -->
 P.S. решение объединить 3 графика в один для biplots скорее плохое, я
 пыталась их отмасштабировать и сделать общий заголовок, но не слишком
 успешно( ~~мне просто хотелось потренироваться соединять графики в один
