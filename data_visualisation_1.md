@@ -64,7 +64,6 @@ for (col in names(insurance)) {
   }
 }
 ```
-datavis_pic/HW1/unnamed-chunk-12-1.png
 ![](datavis_pic/HW1/unnamed-chunk-4-1.png)<!-- -->![](datavis_pic/HW1/unnamed-chunk-4-2.png)<!-- -->![](datavis_pic/HW1/unnamed-chunk-4-3.png)<!-- -->![](datavis_pic/HW1/unnamed-chunk-4-4.png)<!-- -->
 
 Гистограммы по количеству детей выглядит нормально, по ИМТ и возрасту -
@@ -83,7 +82,7 @@ ggplot(data = insurance,
            x = col, y = "Frequency")
 ```
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-5-1.png)<!-- -->
 
 ``` r
 # Преобразование переменной age в категориальную age_group
@@ -103,7 +102,7 @@ ggplot(data = insurance, aes(x = age_group)) +
   theme_classic()
 ```
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-6-1.png)<!-- -->
 
 ``` r
 # Преобразование переменной bmi в категориальную bmi_group 
@@ -123,7 +122,7 @@ ggplot(data = insurance, aes(x = bmi_group)) +
   theme_classic()
 ```
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-6-2.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-6-2.png)<!-- -->
 
 ## Задание №3
 
@@ -145,7 +144,7 @@ charges_density <- ggplot(data = insurance, aes(x = charges)) +
 charges_density
 ```
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-7-1.png)<!-- -->
 
 ## Задание №4
 
@@ -158,7 +157,7 @@ charges_density
   charges_by_sex
 ```
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 charges_by_smokers <- ggplot(data = insurance, aes(x = smoker, y = charges, fill = smoker)) +
@@ -169,7 +168,7 @@ charges_by_smokers <- ggplot(data = insurance, aes(x = smoker, y = charges, fill
 charges_by_smokers
 ```
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 charges_by_regions <- ggplot(data = insurance, aes(x = region, y = charges, fill = region)) +
@@ -180,7 +179,7 @@ charges_by_regions <- ggplot(data = insurance, aes(x = region, y = charges, fill
 charges_by_regions
 ```
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-10-1.png)<!-- -->
 
 ## Задание №5
 
@@ -203,7 +202,7 @@ combine_plot <- combine_plot +
 combine_plot
 ```
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-11-1.png)<!-- -->
 
 ## Задание №6
 
@@ -216,7 +215,7 @@ charges_by_regions_faceted <- charges_by_regions +
 charges_by_regions_faceted
 ```
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-12-1.png)<!-- -->
 
 ## Задание №7-8
 
@@ -235,7 +234,7 @@ scatter_age
 
     ## `geom_smooth()` using formula = 'y ~ x'
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-13-1.png)<!-- -->
 
 ## Задание №9
 
@@ -262,7 +261,7 @@ scatter_age_smoker
 
     ## `geom_smooth()` using formula = 'y ~ x'
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-14-1.png)<!-- -->
 
 ## Задание №10
 
@@ -281,7 +280,7 @@ scatter_bmi
 
     ## `geom_smooth()` using formula = 'y ~ x'
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 scatter_bmi_smoker <- insurance %>% 
@@ -304,7 +303,7 @@ scatter_bmi_smoker
 
     ## `geom_smooth()` using formula = 'y ~ x'
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-15-2.png)<!-- -->
 
 ## Задание № 14
 
@@ -322,4 +321,4 @@ ggplot(data = insurance, aes(x = bmi, y = log_charges)) +
 
     ## `geom_smooth()` using formula = 'y ~ x'
 
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](datavis_pic/HW1/unnamed-chunk-16-1.png)<!-- -->
