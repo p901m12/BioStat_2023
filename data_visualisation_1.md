@@ -64,8 +64,8 @@ for (col in names(insurance)) {
   }
 }
 ```
-
-![](data_visualisation_1_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->![](data_visualisation_1_files/figure-gfm/unnamed-chunk-4-2.png)<!-- -->![](data_visualisation_1_files/figure-gfm/unnamed-chunk-4-3.png)<!-- -->![](data_visualisation_1_files/figure-gfm/unnamed-chunk-4-4.png)<!-- -->
+datavis_pic/HW1/unnamed-chunk-12-1.png
+![](datavis_pic/HW1/unnamed-chunk-4-1.png)<!-- -->![](datavis_pic/HW1/unnamed-chunk-4-2.png)<!-- -->![](datavis_pic/HW1/unnamed-chunk-4-3.png)<!-- -->![](datavis_pic/HW1/unnamed-chunk-4-4.png)<!-- -->
 
 Гистограммы по количеству детей выглядит нормально, по ИМТ и возрасту -
 сносно, чего не скажешь о гистограмме по затратам. Её нужно настраивать
